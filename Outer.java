@@ -15,7 +15,7 @@ import java.io.FileWriter;
 import java.util.Scanner; 
 import java.util.regex.*;
 
-
+// Implementation of a custom Map class
 class Pair <L,R> {
 
     private final L left;
@@ -47,6 +47,7 @@ class Pair <L,R> {
 
 }
 
+// Selection covers a part of a line + indicates the type of a lexeme found there
 class Selection {
     public int from, to;
     public String type;
@@ -58,15 +59,20 @@ class Selection {
     }
 }
 
+// Main class for parsing lexemes
 class LexemesHolder {
     private static Map <String, Integer> pr = new HashMap <String, Integer>();
+    
+    // Priority list of lexemes' types - the search for lexemes goes in this order (because, for example, integers are a partial example of imaginary numbers)
     private static final String[] lexemesTypes = {
             "WHITESPACE", "COMMENT", "PROPERTY", "IMAGINARY", "FLOAT", "STRING", "FUNCTION", "OPERATOR", "KEYWORD",
             "INT", "BOOL", "NONE", "VARIABLE", "UNDEFINED"
         };
     
+    // Container of the regular expressions to be applied on a line of input code
     private static List<Pair> dictionary = new ArrayList<Pair>();
     
+    // Implementation of priority insertion of regular expressions into container (priority queue)
     private static void insertPair(String reg, int type) {
         boolean added = false;
         for (int i = 0; i < dictionary.size(); ++i) {
@@ -80,6 +86,7 @@ class LexemesHolder {
             dictionary.add(new Pair<String, Integer>(reg, type));
     }
     
+    // Constructor for filling the main container of regular expressions
     public LexemesHolder() {
         for (int i = 0; i < lexemesTypes.length; ++i)
             pr.put(lexemesTypes[i], i);
@@ -150,6 +157,7 @@ class LexemesHolder {
         return "\\" + s;
     }
     
+    // Print out the container of regular expressions
     private static void printDict() {
         for (Pair i : dictionary) {
             System.out.println(i.l() + ": " + i.r());
@@ -164,6 +172,7 @@ class LexemesHolder {
         System.out.println(s);
     }
     
+    // Function that returns a string filled with spaces to replace a specific lexeme in a line
     private static String filler(int n) {
         String chronos = "";
         for(int i = 0; i < n; ++i)
@@ -171,6 +180,7 @@ class LexemesHolder {
         return chronos;
     }
     
+    // Escaping special characters for regular expressions
     private static String escape(char s) {
         String r = Character.toString(s);
         String[] special = {
@@ -184,6 +194,7 @@ class LexemesHolder {
         return r;
     }
     
+    // Insert new selection into the queue depending on its starting position
     private static void insertSelection(List<Selection> l, Selection sel){
         for (int i = 0; i < l.size(); ++i){
             if (sel.from < l.get(i).from){
@@ -194,6 +205,8 @@ class LexemesHolder {
         l.add(sel);
     }
     
+    // Get a line, look for lexemes, if a lexeme is found it's cut out of a temporary copy of the current line
+    // and remembered as a selection
     public static List<Selection> parse(String line) {
         List result = new ArrayList<Selection>();
         for (Pair i : dictionary){
@@ -220,6 +233,8 @@ class LexemesHolder {
     }
 }
 
+// Depending on the selection positions and types of lexemes found there, it's wrapped into 
+// html tags with a corresponding class
 class Parser {
     private String finalString = "";
     public Parser(String filename) throws Exception {
@@ -239,6 +254,7 @@ class Parser {
         }
     }
     
+    // Wrapping a string into an html tag with a class corresponding to the type of a lexeme found there
     private static String wrap(String lexem, String name) {
         if (name == "WHITESPACE"){
             if ((int)lexem.charAt(0) == 9)
