@@ -280,7 +280,10 @@ class Parser {
 public class Outer {
     public static void main(String args[]) throws Exception {
         System.out.println("I'm alive!");
-        Parser worker = new Parser("test1.py");
+        Scanner in = new Scanner(System.in);
+        System.out.println("Enter a filename to parse: "); 
+ 	String s = in.nextLine(); 
+        Parser worker = new Parser(s);
         worker.createOutput("output.html");
         System.out.println("Done!");
     }
